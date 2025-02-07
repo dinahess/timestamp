@@ -23,20 +23,23 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+const isValidDate = dt => !isNaN(Date.parse(dt));
+const sendJsonDate = (dt, res) => res.json({ unix: dt.getTime(), utc: dt.toUTCString() });
+
 app.get("/api/:date?", (req, res) => {
   let dt;
   if (!req.params.date) {
     dt = new Date();
-    return res.json({ unix: dt.getTime(), utc: dt.toUTCString() });
+    return sendJsonDate(dt,res);
   }
   dt = new Date(req.params.date);
-  if (!isNaN(Date.parse(dt))) {
-    return res.json({ unix: dt.getTime(), utc: dt.toUTCString() });
+  if (isValidDate(dt)) {
+    return sendJsonDate(dt,res);
   }
   else {
     dt = new Date(Number(req.params.date));
-    if (!isNaN(Date.parse(dt))) {
-      return res.json({ unix: dt.getTime(), utc: dt.toUTCString() });
+    if (isValidDate(dt)) {
+      return sendJsonDate(dt,res);
     }
     else {
       return res.json({ error: dt.toString() });
